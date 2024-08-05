@@ -1,39 +1,54 @@
 const bookModel = require('../model/bookModel')
 
 const addANewBook = async (request, response) => {
-    const { title, author, isbn } = request.body;
-    const coverImage = request.file;
+    const {
+        title,
+        author,
+        genre,
+        publisher,
+        isbn,
+        publicationDate,
+        language,
+        description,
+        availableCopies,
+    } = request.body
+    const coverImage = request.file
 
     try {
-        const path = '/upload/' + coverImage.filename;
-        const existingBook = await bookModel.find({ isbn: isbn });
+        const path = '/upload/' + coverImage.filename
+        const existingBook = await bookModel.find({ isbn: isbn })
 
         if (existingBook.length !== 0) {
             return response.status(409).send({
                 book: existingBook[0],
                 message: 'Book Already Exists',
-            });
+            })
         }
 
         const newBook = new bookModel({
             title,
             author,
+            genre,
+            publisher,
             isbn,
+            publicationDate,
+            language,
+            description,
+            availableCopies,
             coverImage: path,
-        });
-        await newBook.save();
+        })
+        await newBook.save()
 
         response.status(201).send({
             message: 'Added successfully',
             book: newBook,
-        });
+        })
     } catch (error) {
         response.status(500).send({
             message: error.message,
-        });
+        })
     }
 }
-
 
 const getAllBooks = async (request, response) => {
     try {

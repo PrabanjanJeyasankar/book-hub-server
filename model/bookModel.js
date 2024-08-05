@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
 const bookSchema = new mongoose.Schema(
     {
         title: {
@@ -9,48 +10,44 @@ const bookSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Author is a required field'],
         },
+        genre: {
+            type: String,
+            required: [true, 'Genre is a required field'],
+        },
+        publisher: {
+            type: String,
+            required: [true, 'Publisher is a required field'],
+        },
         isbn: {
             type: String,
-            required: true,
+            required: [true, 'ISBN is a required field'],
             match: /^[0-9]{13}$/,
+        },
+        publicationDate: {
+            type: Date,
+            required: [true, 'Publication Date is a required field'],
+        },
+        language: {
+            type: String,
+            required: [true, 'Language is a required field'],
+        },
+        description: {
+            type: String,
+            required: [true, 'Description is a required field'],
+        },
+        availableCopies: {
+            type: Number, 
+            required: [true, 'Available Copies is a required field'],
         },
         coverImage: {
             type: String,
-            required : [true, 'CoverImage is a required field']
-        }
-        // publisher: {
-        //     type: String,
-        //     required: [true, 'publisher is a required field'],
-        // },
-        // publicationDate: {
-        //     type: Date,
-        //     required: [true, 'publication date is a required field'],
-        // },
-        // date:{
-        //     type:
-        // }
+            required: [true, 'Cover Image is a required field'],
+        },
     },
     {
         collection: 'book',
-    },
-    {
-        timeStamp: true,
+        timestamps: true, 
     }
-)
+);
 
-module.exports = mongoose.model('book', bookSchema)
-
-// Book Title
-// Author
-// ISBN
-// Publisher
-// Publication Date
-// dd-mm-yyyy
-// Genre
-// Select Genre
-// Language
-// Cover Image
-// No file chosen
-// Description
-// Available Copies
-// Location
+module.exports = mongoose.model('Book', bookSchema); // Capitalized the model name
