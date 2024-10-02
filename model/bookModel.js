@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const bookSchema = new mongoose.Schema(
     {
@@ -36,7 +36,7 @@ const bookSchema = new mongoose.Schema(
             required: [true, 'Description is a required field'],
         },
         availableCopies: {
-            type: Number, 
+            type: Number,
             required: [true, 'Available Copies is a required field'],
         },
         coverImage: {
@@ -46,8 +46,8 @@ const bookSchema = new mongoose.Schema(
     },
     {
         collection: 'book',
-        timestamps: true, 
+        timestamps: true,
     }
-);
+)
 
-module.exports = mongoose.model('Book', bookSchema); // Capitalized the model name
+module.exports = mongoose.model('Book', bookSchema)
