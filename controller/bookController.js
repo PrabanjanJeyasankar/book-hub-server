@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const bookModel = require('../model/bookModel')
 
 const addANewBook = async (request, response) => {
@@ -70,29 +71,6 @@ const getAllBooks = async (request, response) => {
     }
 }
 
-// const getABookById = async (request, response) => {
-//     const bookIsbn = request.params.id
-//     try {
-//         const book = await bookModel.find({
-//             isbn: bookIsbn,
-//         })
-//         if (book.length == 0) {
-//             return response.status(404).send({
-//                 message: 'Could not find the book',
-//             })
-//         }
-//         console.log(book)
-//         response.status(200).send({
-//             message: 'Found the book',
-//             book: book,
-//         })
-//     } catch (error) {
-//         response.status(500).send({
-//             message: error.message,
-//         })
-//     }
-// }
-
 const getABookById = async (request, response) => {
     const bookIsbn = request.params.id
     try {
@@ -104,7 +82,7 @@ const getABookById = async (request, response) => {
         }
         response.status(200).send({
             message: 'Found the book',
-            book: book[0], // Adjusted to send a single book object
+            book: book[0],
         })
     } catch (error) {
         response.status(500).send({
@@ -146,9 +124,8 @@ const updateBookById = async (request, response) => {
 
 const deleteABookById = async (request, response) => {
     const bookIsbn = request.params.id
-
     try {
-        const deletedBook = await bookModel.findOneAndDelete({ isbn: bookIsbn })
+        const deletedBook = await bookModel.findOne({ isbn: bookIsbn })
 
         if (!deletedBook) {
             return response.status(404).send({
@@ -169,16 +146,12 @@ const deleteABookById = async (request, response) => {
 
 const searchBooks = async (request, response) => {
     const { query, genre, language, publisher } = request.query
-    // console.log(request.query)
 
     try {
-        // console.log(`Searching for query: ${query}`)
-
         const searchCriteria = {
             $or: [
                 { title: { $regex: new RegExp(`^${query}`, 'i') } },
                 { author: { $regex: new RegExp(`^${query}`, 'i') } },
-                // { genre: { $regex: new RegExp(`^${query}`, 'i') } },
             ],
         }
 
@@ -189,6 +162,7 @@ const searchBooks = async (request, response) => {
         if (language) {
             searchCriteria.language = language
         }
+
         if (publisher) {
             searchCriteria.publisher = publisher
         }
@@ -206,12 +180,12 @@ const searchBooks = async (request, response) => {
             books: books,
         })
     } catch (error) {
-        // console.error(error)
         response.status(500).send({
             message: error.message,
         })
     }
 }
+
 
 module.exports = {
     addANewBook,

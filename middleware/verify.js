@@ -3,11 +3,12 @@ const userModel = require('../model/userModel')
 
 const verifyUser = (request, response, next) => {
     const authHeader = request.headers.cookie
+    // console.log(authHeader)
     if (!authHeader) {
-        return response.send(401).send({ message: 'Token not found' })
+        return response.status(401).send({ message: 'Token not found' })
     }
     const cookie = authHeader.split('=')[1]
-    console.log(cookie)
+    // console.log(cookie)
 
     jwt.verify(cookie, process.env.ACCESS_TOKEN, async (error, data) => {
         if (error) {
@@ -16,9 +17,10 @@ const verifyUser = (request, response, next) => {
         const { id } = data
 
         const existingUser = await userModel.findOne({ _id: id })
-        if(!existingUser) {
-            return response.status(401).send({message: 'Unauthorized user'})
+        if (!existingUser) {
+            return response.status(401).send({ message: 'Unauthorized user' })
         }
+        request.user = existingUser
         next()
     })
 }

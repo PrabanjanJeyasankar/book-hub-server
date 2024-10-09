@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const userModel = require('../model/userModel')
+const superAdminCredentials = require('../database/initialData')
 
 const generateUserId = async (libraryNameCode) => {
     const libraryCode = libraryNameCode.toUpperCase()
@@ -22,7 +23,8 @@ const generateUserId = async (libraryNameCode) => {
 }
 
 const signup = async (request, response) => {
-    const { name, email, password } = request.body
+    const { name, email, password, role} = request.body
+    console.log(request.body)
     try {
         const existingUser = await userModel.findOne({ email })
         if (existingUser) {
@@ -31,18 +33,18 @@ const signup = async (request, response) => {
         const libraryCode = 'CHE'
         const userId = await generateUserId(libraryCode)
 
-        const newUser = new userModel({ name, email, password, userId })
+        const newUser = new userModel({ name, email, password, userId , role})
         console.log(newUser)
         await newUser.save()
         const token = newUser.generateJwtToken()
         const options = { httpOnly: 'true', secure: 'true', sameSite: 'none' }
 
-        const { password: userPassword, ...userData } = newUser.toObject()
+        const { password: userPassword, ...userProfile } = newUser.toObject()
 
         response.cookie('sessionId', token, options)
         response.status(201).send({
             message: 'user created and successfully added into DB.',
-            userData,
+            userProfile,
         })
     } catch (error) {
         console.log(error)
@@ -54,7 +56,13 @@ const login = async (request, response) => {
     const { email, password } = request.body
     console.log(request.body)
     try {
+        const allUser = await userModel.find()
+        if (allUser.length == 0) {
+            const adminUser = new userModel(superAdminCredentials)
+            await adminUser.save()
+        }
         const existingUser = await userModel.findOne({ email })
+        // if(existingUser)
         console.log(existingUser)
         if (!existingUser) {
             return response
@@ -72,16 +80,26 @@ const login = async (request, response) => {
 
         const token = existingUser.generateJwtToken()
         const options = { httpOnly: 'true', secure: 'true', sameSite: 'none' }
-        const { password: userPassword, ...userData } = existingUser
+        const { password: userPassword, ...userProfile } = existingUser._doc
 
         response.cookie('sessionId', token, options)
         response
             .status(200)
-            .send({ message: 'Logged in successfully', userData })
+            .send({ message: 'Logged in successfully', userProfile })
     } catch (error) {
         console.log(error)
         response.status(500).send({ message: error.message })
     }
 }
+const logout = (request, response) => {
+    console.log('response')
+    // response.clearCookie('token', {
+    //     httpOnly: true,
+    //     sameSite: 'None',
+    //     secure: true,
+    // })
+    response.setHeader('Clear-Site-Data', '"cookies"')
+    return response.status(200).send({ message: 'Logout successful' })
+}
 
-module.exports = { signup, login }
+module.exports = { signup, login, logout }

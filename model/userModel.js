@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+
 require('dotenv').config()
 
 const userSchema = new mongoose.Schema(
@@ -29,6 +30,12 @@ const userSchema = new mongoose.Schema(
         profileImage: {
             type: String,
         },
+        likedCollections: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'book',
+            },
+        ],
     },
     {
         collection: 'user',
@@ -60,8 +67,8 @@ userSchema.methods.generateJwtToken = function () {
     const id = this._id
     const payload = { id }
     return jwt.sign(payload, process.env.ACCESS_TOKEN, {
-        expiresIn: '1h',
+        expiresIn: '15d',
     })
 }
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('user', userSchema)
