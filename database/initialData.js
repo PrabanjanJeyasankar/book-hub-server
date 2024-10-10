@@ -1,6 +1,6 @@
 const superAdminCredentials = {
     name: 'super admin',
-    email: 'bookhubsuperaadmin@gmail.com',
+    email: 'superadmin@gmail.com',
     password: 'superAdmin',
     role: 'admin',
 }

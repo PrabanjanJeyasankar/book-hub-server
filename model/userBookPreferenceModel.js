@@ -9,11 +9,19 @@ const UserBookPreferenceSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'book',
     },
-    readingStatus: {
-        type: String,
-        enum: ['none', 'finishedReading', 'currentlyReading', 'wantToRead'],
-        default: 'none',
-    },
+    bookmarkedBooks: [
+        {
+            book: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'book',
+            },
+            readingStatus: {
+                type: String,
+                enum: ['finishedReading', 'currentlyReading', 'wantToRead'],
+                default: 'none',
+            },
+        },
+    ],
 })
 
 module.exports = mongoose.model('userPreference', UserBookPreferenceSchema)

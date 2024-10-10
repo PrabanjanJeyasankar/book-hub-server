@@ -1,4 +1,5 @@
 const userBookPreferenceModel = require('../model/userBookPreferenceModel')
+const userModel = require('../model/userModel')
 
 const authenticate = (request, response) => {
     const user = request.user
@@ -10,6 +11,30 @@ const authenticate = (request, response) => {
         })
     } else {
         return response.status(401).send({ message: 'User not authenticated' })
+    }
+}
+
+const getAllUsers = async (request, response) => {
+    console.log(request.user.role)
+    try {
+        if (request.user.role !== 'admin') {
+            return response.status(403).json({
+                message:
+                    'Access denied: you do not have permission to view this data.',
+            })
+        }
+
+        const users = await userModel.find({})
+
+        const filteredUsers = users.filter((user) => user.role === 'user')
+
+        return response.status(200).json({
+            message: 'Users retrieved successfully.',
+            users: filteredUsers,
+        })
+    } catch (error) {
+        console.error('Error fetching users:', error)
+        return response.status(500).json({ message: 'Internal server error.' })
     }
 }
 
@@ -30,12 +55,10 @@ const userLikes = async (request, response) => {
                     likedBooks: [bookId],
                 })
                 await newUserPreference.save()
-                // console.log('Created new user preference with liked book.')
             } else {
                 if (!userPreference.likedBooks.includes(bookId)) {
                     userPreference.likedBooks.push(bookId)
                     await userPreference.save()
-                    // console.log('Added book to liked books.')
                 } else {
                     // console.log('Book is already liked by the user.')
                 }
@@ -61,4 +84,4 @@ const userLikes = async (request, response) => {
     }
 }
 
-module.exports = { authenticate, userLikes }
+module.exports = { authenticate, userLikes, getAllUsers }
