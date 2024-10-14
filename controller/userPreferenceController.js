@@ -130,7 +130,6 @@ const addBookToUserPreference = async (request, response) => {
                 .json({ message: 'Book added to preferences', preference })
         }
     } catch (error) {
-        console.error('Error adding book to preferences:', error)
         return response.status(500).json({ message: 'Internal server error' })
     }
 }
@@ -171,9 +170,7 @@ const getBookPreferencesById = async (request, response) => {
 }
 
 const getUserPreference = async (request, response) => {
-    console.log('first')
     const userId = request.user._id
-    console.log(userId)
 
     try {
         const preferences = await userBookPreferenceModel.aggregate([
@@ -228,13 +225,11 @@ const getUserPreference = async (request, response) => {
                 .json({ message: 'User preferences not found' })
         }
 
-        console.log(preferences)
         response.status(200).json({
             message: 'Fetched user preferences',
             preferences: preferences[0],
         })
     } catch (error) {
-        console.error('Error fetching user preferences:', error)
         response.status(500).json({ message: error.message })
     }
 }

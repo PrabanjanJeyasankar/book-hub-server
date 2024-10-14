@@ -18,13 +18,11 @@ const generateUserId = async (libraryNameCode) => {
     })
 
     const formattedCount = String(usersThisMonth.length + 1).padStart(5, '0')
-    console.log(`${libraryCode}${year}${month}${formattedCount}`)
     return `${libraryCode}${year}${month}${formattedCount}`
 }
 
 const signup = async (request, response) => {
     const { name, email, password, role} = request.body
-    console.log(request.body)
     try {
         const existingUser = await userModel.findOne({ email })
         if (existingUser) {
@@ -34,7 +32,6 @@ const signup = async (request, response) => {
         const userId = await generateUserId(libraryCode)
 
         const newUser = new userModel({ name, email, password, userId , role})
-        console.log(newUser)
         await newUser.save()
         const token = newUser.generateJwtToken()
         const options = { httpOnly: 'true', secure: 'true', sameSite: 'none' }
@@ -47,14 +44,12 @@ const signup = async (request, response) => {
             userProfile,
         })
     } catch (error) {
-        console.log(error)
         response.status(500).send({ message: error.message })
     }
 }
 
 const login = async (request, response) => {
     const { email, password } = request.body
-    console.log(request.body)
     try {
         const allUser = await userModel.find()
         if (allUser.length == 0) {
@@ -63,7 +58,6 @@ const login = async (request, response) => {
         }
         const existingUser = await userModel.findOne({ email })
         // if(existingUser)
-        console.log(existingUser)
         if (!existingUser) {
             return response
                 .status(404)
@@ -87,17 +81,11 @@ const login = async (request, response) => {
             .status(200)
             .send({ message: 'Logged in successfully', userProfile })
     } catch (error) {
-        console.log(error)
         response.status(500).send({ message: error.message })
     }
 }
 const logout = (request, response) => {
-    console.log('response')
-    // response.clearCookie('token', {
-    //     httpOnly: true,
-    //     sameSite: 'None',
-    //     secure: true,
-    // })
+
     response.setHeader('Clear-Site-Data', '"cookies"')
     return response.status(200).send({ message: 'Logout successful' })
 }

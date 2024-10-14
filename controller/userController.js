@@ -3,7 +3,6 @@ const userModel = require('../model/userModel')
 
 const authenticate = (request, response) => {
     const user = request.user
-    console.log('user', user)
     if (user) {
         return response.status(200).send({
             message: 'Authentication successful, valid user.',
@@ -15,7 +14,6 @@ const authenticate = (request, response) => {
 }
 
 const getAllUsers = async (request, response) => {
-    console.log(request.user.role)
     try {
         if (request.user.role !== 'admin') {
             return response.status(403).json({
@@ -33,7 +31,6 @@ const getAllUsers = async (request, response) => {
             users: filteredUsers,
         })
     } catch (error) {
-        console.error('Error fetching users:', error)
         return response.status(500).json({ message: 'Internal server error.' })
     }
 }
@@ -79,7 +76,6 @@ const userLikes = async (request, response) => {
             .status(200)
             .json({ message: 'User likes updated successfully.' })
     } catch (error) {
-        console.error('Error in userLikes:', error)
         return response.status(500).json({ message: error.message })
     }
 }

@@ -91,7 +91,6 @@ const getAllBooks = async (request, response) => {
                 message: 'Data Not Found !',
             })
         }
-        // console.log(books)
         response.status(200).send({
             message: 'All books Fetched',
             books: books,
