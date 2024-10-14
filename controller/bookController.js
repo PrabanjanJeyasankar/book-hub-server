@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bookModel = require('../model/bookModel')
+const streamifier = require('streamifier');
+const cloudinary = require('../configuration/cloudinaryConfig');
 
 const addANewBook = async (request, response) => {
     const {
@@ -26,6 +28,36 @@ const addANewBook = async (request, response) => {
             })
         }
 
+        let imageURL = ''
+        if(request.file) {
+            try {
+                const uploadImage = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "blog-app",          
+                            use_filename: true,           
+                            unique_filename: false,      
+                        },
+                        (error, result) => {
+                            if (result) {
+                                resolve(result);
+                            } else {
+                                reject(error);
+                            }
+                        }
+                    );
+
+                    streamifier.createReadStream(request.file.buffer).pipe(stream);
+                });
+                imageURL = uploadImage.secure_url
+            }
+            catch(error) {
+                console.error('Cloudinary upload error:', error)
+                return response.status(500).send({ message: 'Image upload failed' })
+            }
+        } else {
+            return response.status(400).send({ message: "Error while uploading image, try again later"})
+        }
         const newBook = new bookModel({
             title,
             author,
@@ -36,7 +68,7 @@ const addANewBook = async (request, response) => {
             language,
             description,
             availableCopies,
-            coverImage: path,
+            coverImage: imageURL,
         })
         await newBook.save()
 
@@ -94,11 +126,36 @@ const getABookById = async (request, response) => {
 const updateBookById = async (request, response) => {
     const bookIsbn = request.params.id
     const updatedData = request.body
-    const coverImage = request.file
 
     try {
-        if (coverImage) {
-            updatedData.coverImage = '/upload/' + coverImage.filename
+        let imageURL = ''
+        if(request.file) {
+            try {
+                const uploadImage = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "blog-app",          
+                            use_filename: true,           
+                            unique_filename: false,      
+                        },
+                        (error, result) => {
+                            if (result) {
+                                resolve(result);
+                            } else {
+                                reject(error);
+                            }
+                        }
+                    );
+
+                    streamifier.createReadStream(request.file.buffer).pipe(stream);
+                });
+                imageURL = uploadImage.secure_url
+            }
+            catch(error) {
+                console.error('Cloudinary upload error:', error)
+                return response.status(500).send({ message: 'Image upload failed' })
+            }
+            updatedData.coverImage = imageURL
         }
 
         const updatedBook = await bookModel.findOneAndUpdate(

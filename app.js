@@ -6,7 +6,6 @@ const PORT = 3500
 const cookieParser = require('cookie-parser')
 
 const bookRouter = require('./router/bookRouter')
-const imageRouter = require('./router/imageRouter')
 const userRouter = require('./router/userRouter')
 const adminRouter = require('./router/adminRouter')
 
@@ -31,7 +30,7 @@ app.get('/', (request, response) => {
 
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: process.env.CORS_ORIGIN_URL,
         credentials: true,
     })
 )
@@ -40,9 +39,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 app.use('/api/v1/book', bookRouter)
-app.use('/api/v1', imageRouter)
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/admin', adminRouter)
-// app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
 app.listen(PORT, console.log(`server running at http://localhost:${PORT}`))
