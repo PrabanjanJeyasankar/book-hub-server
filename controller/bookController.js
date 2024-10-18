@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 const bookModel = require('../model/bookModel')
-const streamifier = require('streamifier');
-const cloudinary = require('../configuration/cloudinaryConfig');
+const streamifier = require('streamifier')
+const cloudinary = require('../configuration/cloudinaryConfig')
 
 const addANewBook = async (request, response) => {
     const {
@@ -29,34 +29,41 @@ const addANewBook = async (request, response) => {
         }
 
         let imageURL = ''
-        if(request.file) {
+        if (request.file) {
             try {
                 const uploadImage = await new Promise((resolve, reject) => {
                     const stream = cloudinary.uploader.upload_stream(
                         {
-                            folder: "blog-app",          
-                            use_filename: true,           
-                            unique_filename: false,      
+                            folder: 'blog-app',
+                            use_filename: true,
+                            unique_filename: false,
                         },
                         (error, result) => {
                             if (result) {
-                                resolve(result);
+                                resolve(result)
                             } else {
-                                reject(error);
+                                reject(error)
                             }
                         }
-                    );
+                    )
 
-                    streamifier.createReadStream(request.file.buffer).pipe(stream);
-                });
+                    streamifier
+                        .createReadStream(request.file.buffer)
+                        .pipe(stream)
+                })
                 imageURL = uploadImage.secure_url
-            }
-            catch(error) {
+            } catch (error) {
                 console.error('Cloudinary upload error:', error)
-                return response.status(500).send({ message: 'Image upload failed' })
+                return response
+                    .status(500)
+                    .send({ message: 'Image upload failed' })
             }
         } else {
-            return response.status(400).send({ message: "Error while uploading image, try again later"})
+            return response
+                .status(400)
+                .send({
+                    message: 'Error while uploading image, try again later',
+                })
         }
         const newBook = new bookModel({
             title,
@@ -128,31 +135,34 @@ const updateBookById = async (request, response) => {
 
     try {
         let imageURL = ''
-        if(request.file) {
+        if (request.file) {
             try {
                 const uploadImage = await new Promise((resolve, reject) => {
                     const stream = cloudinary.uploader.upload_stream(
                         {
-                            folder: "blog-app",          
-                            use_filename: true,           
-                            unique_filename: false,      
+                            folder: 'blog-app',
+                            use_filename: true,
+                            unique_filename: false,
                         },
                         (error, result) => {
                             if (result) {
-                                resolve(result);
+                                resolve(result)
                             } else {
-                                reject(error);
+                                reject(error)
                             }
                         }
-                    );
+                    )
 
-                    streamifier.createReadStream(request.file.buffer).pipe(stream);
-                });
+                    streamifier
+                        .createReadStream(request.file.buffer)
+                        .pipe(stream)
+                })
                 imageURL = uploadImage.secure_url
-            }
-            catch(error) {
+            } catch (error) {
                 console.error('Cloudinary upload error:', error)
-                return response.status(500).send({ message: 'Image upload failed' })
+                return response
+                    .status(500)
+                    .send({ message: 'Image upload failed' })
             }
             updatedData.coverImage = imageURL
         }
@@ -181,8 +191,8 @@ const updateBookById = async (request, response) => {
 const deleteABookById = async (request, response) => {
     const bookIsbn = request.params.id
     try {
-        const deletedBook = await bookModel.findOne({ isbn: bookIsbn })
-
+        const deletedBook = await bookModel.findOneAndDelete({ isbn: bookIsbn })
+        console.log('del',deletedBook)
         if (!deletedBook) {
             return response.status(404).send({
                 message: 'Book not found',
@@ -241,8 +251,6 @@ const searchBooks = async (request, response) => {
         })
     }
 }
-
-
 
 module.exports = {
     addANewBook,
