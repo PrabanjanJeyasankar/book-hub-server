@@ -1,5 +1,7 @@
 const userBookPreferenceModel = require('../model/userBookPreferenceModel')
 const userModel = require('../model/userModel')
+const streamifier = require('streamifier')
+const cloudinary = require('../configuration/cloudinaryConfig')
 
 const authenticate = (request, response) => {
     const user = request.user
@@ -80,4 +82,88 @@ const userLikes = async (request, response) => {
     }
 }
 
-module.exports = { authenticate, userLikes, getAllUsers }
+const updateUserProfileImage = async (request, response) => {
+    console.log(request)
+    try {
+        const userId = request.user._id
+
+        const existingUser = await userModel.findOne({
+            _id: userId,
+        })
+
+        if (!existingUser) {
+            return response.status(404).send({ message: "User not found" })
+        }
+        console.log(request.file)
+        let imageURL = ''
+        if (request.file) {
+            try {
+                const uploadImage = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'book-hub',
+                            use_filename: true,
+                            unique_filename: false,
+                        },
+                        (error, result) => {
+                            if (result) {
+                                resolve(result)
+                            } else {
+                                reject(error)
+                            }
+                        }
+                    )
+
+                    streamifier
+                        .createReadStream(request.file.buffer)
+                        .pipe(stream)
+                })
+                imageURL = uploadImage.secure_url
+            } catch (error) {
+                console.error('Cloudinary upload error:', error)
+                return response
+                    .status(500)
+                    .send({ message: 'Image upload failed' })
+            }
+            existingUser.profileImage = imageURL
+            existingUser.save()
+            response
+                .status(200)
+                .send({ message: 'profile image uploaded successfully.' })
+        } else {
+            return response.status(400).send({
+                message: 'Error while uploading image, try again later',
+            })
+        }
+    } catch (error) {
+        return response.status(500).json({ message: error.message })
+    }
+}
+
+const getProfilePicture = async (request, response) => {
+    try {
+        const userId = request.user._id; // Get the user ID from the verified user info
+
+        // Find the user by ID
+        const existingUser = await userModel.findById(userId).select('profileImage'); // Select only the profileImage field
+
+        if (!existingUser) {
+            return response.status(404).send({ message: "User not found" });
+        }
+
+        // Return the profile image URL
+        return response.status(200).json({ profileImage: existingUser.profileImage || null }); // Return null if no image is found
+    } catch (error) {
+        console.error('Error fetching profile image:', error);
+        return response.status(500).json({ message: error.message });
+    }
+}
+
+
+module.exports = {
+    authenticate,
+    userLikes,
+    getAllUsers,
+    updateUserProfileImage,
+    getProfilePicture
+}
