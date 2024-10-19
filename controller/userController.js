@@ -94,7 +94,7 @@ const updateUserProfileImage = async (request, response) => {
         if (!existingUser) {
             return response.status(404).send({ message: "User not found" })
         }
-        console.log(request.file)
+        // console.log(request.file)
         let imageURL = ''
         if (request.file) {
             try {
