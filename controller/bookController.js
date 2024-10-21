@@ -192,6 +192,7 @@ const deleteABookById = async (request, response) => {
     const bookIsbn = request.params.id
     try {
         const deletedBook = await bookModel.findOneAndDelete({ isbn: bookIsbn })
+        // const deletedBook = await bookModel.findOne({ isbn: bookIsbn })
         console.log('del',deletedBook)
         if (!deletedBook) {
             return response.status(404).send({

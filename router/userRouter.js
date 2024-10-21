@@ -9,7 +9,6 @@ router.post('/signup', signup)
 router.post('/login', login)
 router.get('/logout', logout)
 router.get('/authenticate', verifyUser, authenticate)
-router.get('/all-users', verifyUser, getAllUsers)
 router.get('/profile-picture', verifyUser, getProfilePicture)
 router.patch('/update-profile',upload.single('file'), verifyUser, updateUserProfileImage)
 

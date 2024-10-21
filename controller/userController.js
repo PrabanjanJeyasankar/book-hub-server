@@ -16,6 +16,7 @@ const authenticate = (request, response) => {
 }
 
 const getAllUsers = async (request, response) => {
+    // console.log(request.user.role)
     try {
         if (request.user.role !== 'admin') {
             return response.status(403).json({
@@ -92,7 +93,7 @@ const updateUserProfileImage = async (request, response) => {
         })
 
         if (!existingUser) {
-            return response.status(404).send({ message: "User not found" })
+            return response.status(404).send({ message: 'User not found' })
         }
         // console.log(request.file)
         let imageURL = ''
@@ -142,28 +143,31 @@ const updateUserProfileImage = async (request, response) => {
 
 const getProfilePicture = async (request, response) => {
     try {
-        const userId = request.user._id; // Get the user ID from the verified user info
+        const userId = request.user._id // Get the user ID from the verified user info
 
         // Find the user by ID
-        const existingUser = await userModel.findById(userId).select('profileImage'); // Select only the profileImage field
+        const existingUser = await userModel
+            .findById(userId)
+            .select('profileImage') // Select only the profileImage field
 
         if (!existingUser) {
-            return response.status(404).send({ message: "User not found" });
+            return response.status(404).send({ message: 'User not found' })
         }
 
         // Return the profile image URL
-        return response.status(200).json({ profileImage: existingUser.profileImage || null }); // Return null if no image is found
+        return response
+            .status(200)
+            .json({ profileImage: existingUser.profileImage || null }) // Return null if no image is found
     } catch (error) {
-        console.error('Error fetching profile image:', error);
-        return response.status(500).json({ message: error.message });
+        console.error('Error fetching profile image:', error)
+        return response.status(500).json({ message: error.message })
     }
 }
-
 
 module.exports = {
     authenticate,
     userLikes,
     getAllUsers,
     updateUserProfileImage,
-    getProfilePicture
+    getProfilePicture,
 }
