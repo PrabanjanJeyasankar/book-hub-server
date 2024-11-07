@@ -16,7 +16,6 @@ const authenticate = (request, response) => {
 }
 
 const getAllUsers = async (request, response) => {
-    // console.log(request.user.role)
     try {
         if (request.user.role !== 'admin') {
             return response.status(403).json({
@@ -59,8 +58,6 @@ const userLikes = async (request, response) => {
                 if (!userPreference.likedBooks.includes(bookId)) {
                     userPreference.likedBooks.push(bookId)
                     await userPreference.save()
-                } else {
-                    // console.log('Book is already liked by the user.')
                 }
             }
         } else {
@@ -69,9 +66,6 @@ const userLikes = async (request, response) => {
                     (id) => !id.equals(bookId)
                 )
                 await userPreference.save()
-                // console.log('Removed book from liked books.')
-            } else {
-                // console.log('Book is not liked by the user, cannot unlike.')
             }
         }
 
@@ -84,7 +78,6 @@ const userLikes = async (request, response) => {
 }
 
 const updateUserProfileImage = async (request, response) => {
-    console.log(request)
     try {
         const userId = request.user._id
 
@@ -95,7 +88,6 @@ const updateUserProfileImage = async (request, response) => {
         if (!existingUser) {
             return response.status(404).send({ message: 'User not found' })
         }
-        // console.log(request.file)
         let imageURL = ''
         if (request.file) {
             try {
@@ -121,7 +113,6 @@ const updateUserProfileImage = async (request, response) => {
                 })
                 imageURL = uploadImage.secure_url
             } catch (error) {
-                console.error('Cloudinary upload error:', error)
                 return response
                     .status(500)
                     .send({ message: 'Image upload failed' })
@@ -143,23 +134,19 @@ const updateUserProfileImage = async (request, response) => {
 
 const getProfilePicture = async (request, response) => {
     try {
-        const userId = request.user._id // Get the user ID from the verified user info
-
-        // Find the user by ID
+        const userId = request.user._id
         const existingUser = await userModel
             .findById(userId)
-            .select('profileImage') // Select only the profileImage field
+            .select('profileImage')
 
         if (!existingUser) {
             return response.status(404).send({ message: 'User not found' })
         }
 
-        // Return the profile image URL
         return response
             .status(200)
-            .json({ profileImage: existingUser.profileImage || null }) // Return null if no image is found
+            .json({ profileImage: existingUser.profileImage || null })
     } catch (error) {
-        console.error('Error fetching profile image:', error)
         return response.status(500).json({ message: error.message })
     }
 }

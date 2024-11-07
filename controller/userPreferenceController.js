@@ -219,10 +219,16 @@ const getUserPreference = async (request, response) => {
             },
         ])
 
-        if (preferences.length === 0) {
-            return response
-                .status(404)
-                .json({ message: 'User preferences not found' })
+        if (
+            preferences.length === 0 ||
+            (!preferences[0].likedBooks.length &&
+                !preferences[0].bookmarkedBooks.length)
+        ) {
+            return response.status(200).json({
+                message:
+                    'User preferences not found. Please like or bookmark books.',
+                noPreferences: true,
+            })
         }
 
         response.status(200).json({

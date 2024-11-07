@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 const bookRouter = require('./router/bookRouter')
 const userRouter = require('./router/userRouter')
 const adminRouter = require('./router/adminRouter')
+const googleAuthRoute = require('./router/googleAuthRoute')
 
 const cors = require('cors')
 
@@ -23,6 +24,7 @@ db.on('error', (error) => {
 db.once('open', () => {
     console.log('db connected successfully.')
 })
+
 
 app.get('/', (request, response) => {
     response.status(200).send({ message: 'server running successfully' })
@@ -41,5 +43,7 @@ app.use(cookieParser())
 app.use('/api/v1/book', bookRouter)
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/admin', adminRouter)
+
+app.use('/api/v1/google-auth', googleAuthRoute)
 
 app.listen(PORT, console.log(`server running at http://localhost:${PORT}`))

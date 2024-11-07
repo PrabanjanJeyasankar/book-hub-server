@@ -6,6 +6,11 @@ require('dotenv').config()
 
 const userSchema = new mongoose.Schema(
     {
+        accountType: {
+            type: String,
+            enum: ['google', 'email'],
+            default: 'email',
+        },
         name: {
             type: String,
             required: true,
@@ -16,14 +21,21 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
+            required: function () {
+                return this.signInType === 'email'
+            },
         },
         userId: {
             type: String,
             required: true,
         },
+        verifiedUser: {
+            type: Boolean,
+            default: false,
+        },
         role: {
             type: String,
+            required: true,
             enum: ['user', 'admin'],
             default: 'user',
         },

@@ -53,7 +53,6 @@ const addANewBook = async (request, response) => {
                 })
                 imageURL = uploadImage.secure_url
             } catch (error) {
-                console.error('Cloudinary upload error:', error)
                 return response
                     .status(500)
                     .send({ message: 'Image upload failed' })
@@ -159,7 +158,6 @@ const updateBookById = async (request, response) => {
                 })
                 imageURL = uploadImage.secure_url
             } catch (error) {
-                console.error('Cloudinary upload error:', error)
                 return response
                     .status(500)
                     .send({ message: 'Image upload failed' })
@@ -192,8 +190,6 @@ const deleteABookById = async (request, response) => {
     const bookIsbn = request.params.id
     try {
         const deletedBook = await bookModel.findOneAndDelete({ isbn: bookIsbn })
-        // const deletedBook = await bookModel.findOne({ isbn: bookIsbn })
-        console.log('del',deletedBook)
         if (!deletedBook) {
             return response.status(404).send({
                 message: 'Book not found',
