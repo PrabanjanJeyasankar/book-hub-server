@@ -78,6 +78,7 @@ const requestSignupOtp = async (request, response) => {
             .status(200)
             .send(setResponseBody('OTP sent to your email', null, null))
     } catch (error) {
+        console.log("otp error", error)
         if (error instanceof OtpError) {
             return response
                 .status(423)
